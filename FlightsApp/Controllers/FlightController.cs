@@ -1,5 +1,6 @@
 ﻿using FlightsApp.Data;
 using FlightsApp.Models;
+using FlightsApp.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,31 +13,32 @@ namespace FlightsApp.Controllers
     [ApiController]
     public class FlightController : ControllerBase
     {
-        private readonly FlightContext _flightContext;
-        public FlightController(FlightContext flightContext)
+        private readonly IFlightRepository _flightRepository;
+
+        public FlightController(IFlightRepository flightRepository)
         {
-            _flightContext = flightContext;
+            _flightRepository = flightRepository;
         }
 
         [HttpPost]
-        public async Task<ActionResult<Flight>> AddFlight(Flight flight)
+        public async Task<ActionResult<FlightModel>> AddFlight(FlightModel flight)
         {
-            _flightContext.Flights.Add(flight);
-            await _flightContext.SaveChangesAsync();
-            return Ok(flight);
+            var addedFlight = await _flightRepository.AddFlight(flight);
+            return Ok(addedFlight);
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Flight>>> GetAllFlights()
+        public async Task<ActionResult<List<FlightModel>>> GetAllFlights()
         {
-            return Ok(await _flightContext.Flights.ToListAsync());
+            var flights = await _flightRepository.GetAllFlights();
+            return Ok(flights);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Flight>> GetFlight(int id)
+        public async Task<ActionResult<FlightModel>> GetFlight(int id)
         {
-            var flight = await _flightContext.Flights.FindAsync(id);
-            if(flight == null)
+            var flight = await _flightRepository.GetFlight(id);
+            if (flight == null)
             {
                 return BadRequest("Flight not found.");
             }
@@ -44,37 +46,24 @@ namespace FlightsApp.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Flight>> UpdateFlight(int id, Flight updatedFlight)
+        public async Task<ActionResult<FlightModel>> UpdateFlight(int id, FlightModel updatedFlight)
         {
-            var flight = await _flightContext.Flights.FindAsync(id);
+            var flight = await _flightRepository.UpdateFlight(id, updatedFlight);
             if (flight == null)
             {
                 return BadRequest("Flight not found.");
             }
-
-            flight.FlightNumber = updatedFlight.FlightNumber;
-            flight.DepartureDate = updatedFlight.DepartureDate;
-            flight.DepartureLocation = updatedFlight.DepartureLocation;
-            flight.DestinationLocation = updatedFlight.DestinationLocation;
-            flight.AircraftType = updatedFlight.AircraftType;
-
-            await _flightContext.SaveChangesAsync();
-
             return Ok(flight);
         }
 
         [HttpDelete]
         public async Task<ActionResult> DeleteFlight(int id)
         {
-            var flight = await _flightContext.Flights.FindAsync(id);
-            if (flight == null)
+            var result = await _flightRepository.DeleteFlight(id);
+            if (result == null)
             {
                 return BadRequest("Flight not found.");
             }
-            _flightContext.Flights.Remove(flight);
-
-            await _flightContext.SaveChangesAsync();
-
             return Ok("Flight deleted.");
         }
     }

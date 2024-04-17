@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FlightsApp.Models
 {
-    public class Flight
+    public class FlightModel
     {
         public enum Aircraft
         {

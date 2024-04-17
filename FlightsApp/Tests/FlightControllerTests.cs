@@ -1,6 +1,7 @@
 ﻿using FlightsApp.Controllers;
 using FlightsApp.Data;
 using FlightsApp.Models;
+using FlightsApp.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +30,8 @@ namespace FlightsApp.Tests
                 .Options;
             _context = new FlightContext(_options);
             _context.Database.EnsureCreated();
-            _controller = new FlightController(_context);
+            var _flightRepository = new FlightRepository(_context);
+            _controller = new FlightController(_flightRepository);
         }
 
         private static SqliteConnection CreateInMemoryDatabase()
@@ -42,22 +44,22 @@ namespace FlightsApp.Tests
         public async Task AddFlight_ReturnsAddedFlight()
         {
             // Arrange
-            var newFlight = new Flight
+            var newFlight = new FlightModel
             {
                 FlightNumber = "FA101",
                 DepartureDate = DateTime.UtcNow,
                 DepartureLocation = "Warszawa",
                 DestinationLocation = "Bydgoszcz",
-                AircraftType = Flight.Aircraft.Boeing
+                AircraftType = FlightModel.Aircraft.Boeing
             };
 
             // Act
             var result = await _controller.AddFlight(newFlight);
 
             // Assert
-            var actionResult = Assert.IsType<ActionResult<Flight>>(result);
+            var actionResult = Assert.IsType<ActionResult<FlightModel>>(result);
             var okObjectResult = Assert.IsType<OkObjectResult>(actionResult.Result);
-            var model = Assert.IsType<Flight>(okObjectResult.Value);
+            var model = Assert.IsType<FlightModel>(okObjectResult.Value);
 
             var savedFlight = await _context.Flights.FirstOrDefaultAsync(f => f.FlightNumber == newFlight.FlightNumber);
             Assert.NotNull(savedFlight);
@@ -70,23 +72,23 @@ namespace FlightsApp.Tests
         public async Task GetAllFlights_ReturnsFlightsList()
         {
             // Arrange
-            var flightsToAdd = new List<Flight>
+            var flightsToAdd = new List<FlightModel>
             {
-                new Flight
+                new FlightModel
                 {
                     FlightNumber = "FA101",
                     DepartureDate = DateTime.UtcNow,
                     DepartureLocation = "Warszawa",
                     DestinationLocation = "Kraków",
-                    AircraftType = Flight.Aircraft.Boeing
+                    AircraftType = FlightModel.Aircraft.Boeing
                 },
-                new Flight
+                new FlightModel
                 {
                     FlightNumber = "FA102",
                     DepartureDate = DateTime.UtcNow.AddDays(1),
                     DepartureLocation = "Gdańsk",
                     DestinationLocation = "Kraków",
-                    AircraftType = Flight.Aircraft.Airbus
+                    AircraftType = FlightModel.Aircraft.Airbus
                 },
             };
 
@@ -98,20 +100,20 @@ namespace FlightsApp.Tests
 
             // Assert
             var okObjectResult = Assert.IsType<OkObjectResult>(actionResult.Result);
-            var model = Assert.IsAssignableFrom<List<Flight>>(okObjectResult.Value);
+            var model = Assert.IsAssignableFrom<List<FlightModel>>(okObjectResult.Value);
             Assert.Equal(flightsToAdd.Count, model.Count);
         }
         [Fact]
         public async Task GetFlightById_ShouldReturnFlight()
         {
             // Arrange
-            var newFlight = new Flight
+            var newFlight = new FlightModel
             {
                 FlightNumber = "FA101",
                 DepartureDate = DateTime.UtcNow,
                 DepartureLocation = "Warszawa",
                 DestinationLocation = "Bydgoszcz",
-                AircraftType = Flight.Aircraft.Boeing
+                AircraftType = FlightModel.Aircraft.Boeing
             };
 
             // Act
@@ -119,9 +121,9 @@ namespace FlightsApp.Tests
             var result = await _controller.GetFlight(1);
 
             // Assert
-            var actionResult = Assert.IsType<ActionResult<Flight>>(result);
+            var actionResult = Assert.IsType<ActionResult<FlightModel>>(result);
             var okObjectResult = Assert.IsType<OkObjectResult>(actionResult.Result);
-            var model = Assert.IsType<Flight>(okObjectResult.Value);
+            var model = Assert.IsType<FlightModel>(okObjectResult.Value);
 
             Assert.NotNull(model);
             Assert.Equal(newFlight.FlightNumber, model.FlightNumber);
@@ -145,33 +147,33 @@ namespace FlightsApp.Tests
         public async Task UpdateFlight_ShouldUpdateFlight()
         {
             // Arrange
-            var newFlight = new Flight
+            var newFlight = new FlightModel
             {
                 FlightNumber = "FA101",
                 DepartureDate = DateTime.UtcNow,
                 DepartureLocation = "Warszawa",
                 DestinationLocation = "Bydgoszcz",
-                AircraftType = Flight.Aircraft.Boeing
+                AircraftType = FlightModel.Aircraft.Boeing
             };
 
             await _controller.AddFlight(newFlight);
 
-            var updatedFlight = new Flight
+            var updatedFlight = new FlightModel
             {
                 FlightNumber = "FA102",
                 DepartureDate = DateTime.UtcNow.AddDays(1),
                 DepartureLocation = "Gdańsk",
                 DestinationLocation = "Kraków",
-                AircraftType = Flight.Aircraft.Airbus
+                AircraftType = FlightModel.Aircraft.Airbus
             };
 
             // Act
             var result = await _controller.UpdateFlight(1, updatedFlight);
 
             // Assert
-            var actionResult = Assert.IsType<ActionResult<Flight>>(result);
+            var actionResult = Assert.IsType<ActionResult<FlightModel>>(result);
             var okObjectResult = Assert.IsType<OkObjectResult>(actionResult.Result);
-            var model = Assert.IsType<Flight>(okObjectResult.Value);
+            var model = Assert.IsType<FlightModel>(okObjectResult.Value);
 
             Assert.Equal(updatedFlight.DepartureDate, model.DepartureDate);
             Assert.Equal(updatedFlight.DepartureLocation, model.DepartureLocation);
@@ -183,13 +185,13 @@ namespace FlightsApp.Tests
         public async Task DeleteFlight_ShouldDeleteFlight()
         {
             // Arrange
-            var newFlight = new Flight
+            var newFlight = new FlightModel
             {
                 FlightNumber = "FA101",
                 DepartureDate = DateTime.UtcNow,
                 DepartureLocation = "Warszawa",
                 DestinationLocation = "Bydgoszcz",
-                AircraftType = Flight.Aircraft.Boeing
+                AircraftType = FlightModel.Aircraft.Boeing
             };
 
             await _controller.AddFlight(newFlight);

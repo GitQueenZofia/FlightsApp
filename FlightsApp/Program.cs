@@ -1,5 +1,6 @@
 using FlightsApp.Data;
 using FlightsApp.Models;
+using FlightsApp.Repositories;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -16,6 +17,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IFlightRepository, FlightRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(swagger =>
 {
@@ -55,7 +58,7 @@ builder.Services.AddDbContext<FlightContext>(options =>
 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // For Identity
-builder.Services.AddIdentity<User, IdentityRole>(options =>
+builder.Services.AddIdentity<UserModel, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
