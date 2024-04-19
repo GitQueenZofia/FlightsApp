@@ -1,4 +1,6 @@
-﻿using FlightsApp.Data;
+﻿using AutoMapper;
+using FlightsApp.Data;
+using FlightsApp.Dtos;
 using FlightsApp.Models;
 using FlightsApp.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -14,17 +16,20 @@ namespace FlightsApp.Controllers
     public class FlightController : ControllerBase
     {
         private readonly IFlightRepository _flightRepository;
+        private readonly IMapper _mapper;
 
-        public FlightController(IFlightRepository flightRepository)
+        public FlightController(IFlightRepository flightRepository, IMapper mapper)
         {
             _flightRepository = flightRepository;
+            _mapper = mapper;
         }
 
         [HttpPost]
-        public async Task<ActionResult<FlightModel>> AddFlight(FlightModel flight)
+        public async Task<ActionResult<FlightModel>> AddFlight([FromBody] FlightDto addedFlight)
         {
-            var addedFlight = await _flightRepository.AddFlight(flight);
-            return Ok(addedFlight);
+            var addedFlightDto = _mapper.Map<FlightModel>(addedFlight);
+            var flight = await _flightRepository.AddFlight(addedFlightDto);
+            return Ok(flight);
         }
 
         [HttpGet]
@@ -45,10 +50,11 @@ namespace FlightsApp.Controllers
             return Ok(flight);
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult<FlightModel>> UpdateFlight(int id, FlightModel updatedFlight)
+        [HttpPut("id")]
+        public async Task<ActionResult<FlightModel>> UpdateFlight(int id, [FromBody]FlightDto updatedFlight)
         {
-            var flight = await _flightRepository.UpdateFlight(id, updatedFlight);
+            var updatedFlightDto = _mapper.Map<FlightModel>(updatedFlight);
+            var flight = await _flightRepository.UpdateFlight(id, updatedFlightDto);
             if (flight == null)
             {
                 return BadRequest("Flight not found.");

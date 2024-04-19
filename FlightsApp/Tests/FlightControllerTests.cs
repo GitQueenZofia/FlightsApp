@@ -1,5 +1,8 @@
-﻿using FlightsApp.Controllers;
+﻿using AutoMapper;
+using FlightsApp.Controllers;
 using FlightsApp.Data;
+using FlightsApp.Dtos;
+using FlightsApp.Helper;
 using FlightsApp.Models;
 using FlightsApp.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -14,9 +17,6 @@ using Xunit;
 
 namespace FlightsApp.Tests
 {
-    [TestCaseOrderer(
-    ordererTypeName: "FlightsApp.Tests.PriorityOrderer",
-    ordererAssemblyName: "FlightsApp.Tests")]
     public class FlightControllerTests
     {
         private DbContextOptions<FlightContext> _options;
@@ -30,8 +30,16 @@ namespace FlightsApp.Tests
                 .Options;
             _context = new FlightContext(_options);
             _context.Database.EnsureCreated();
+
+
+            var configuration = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new MappingProfiles());
+            });
+            IMapper mapper = new Mapper(configuration);
+
             var _flightRepository = new FlightRepository(_context);
-            _controller = new FlightController(_flightRepository);
+            _controller = new FlightController(_flightRepository, mapper);
         }
 
         private static SqliteConnection CreateInMemoryDatabase()
@@ -44,7 +52,7 @@ namespace FlightsApp.Tests
         public async Task AddFlight_ReturnsAddedFlight()
         {
             // Arrange
-            var newFlight = new FlightModel
+            var newFlight = new FlightDto
             {
                 FlightNumber = "FA101",
                 DepartureDate = DateTime.UtcNow,
@@ -107,7 +115,7 @@ namespace FlightsApp.Tests
         public async Task GetFlightById_ShouldReturnFlight()
         {
             // Arrange
-            var newFlight = new FlightModel
+            var newFlight = new FlightDto
             {
                 FlightNumber = "FA101",
                 DepartureDate = DateTime.UtcNow,
@@ -147,7 +155,7 @@ namespace FlightsApp.Tests
         public async Task UpdateFlight_ShouldUpdateFlight()
         {
             // Arrange
-            var newFlight = new FlightModel
+            var newFlight = new FlightDto
             {
                 FlightNumber = "FA101",
                 DepartureDate = DateTime.UtcNow,
@@ -158,7 +166,7 @@ namespace FlightsApp.Tests
 
             await _controller.AddFlight(newFlight);
 
-            var updatedFlight = new FlightModel
+            var updatedFlight = new FlightDto
             {
                 FlightNumber = "FA102",
                 DepartureDate = DateTime.UtcNow.AddDays(1),
@@ -185,7 +193,7 @@ namespace FlightsApp.Tests
         public async Task DeleteFlight_ShouldDeleteFlight()
         {
             // Arrange
-            var newFlight = new FlightModel
+            var newFlight = new FlightDto
             {
                 FlightNumber = "FA101",
                 DepartureDate = DateTime.UtcNow,

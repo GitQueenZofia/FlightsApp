@@ -16,20 +16,18 @@ using static System.Net.Mime.MediaTypeNames;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IFlightRepository, FlightRepository>();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(swagger =>
 {
-    //This is to generate the Default UI of Swagger Documentation
     swagger.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1",
         Title = "Flights Web API",
     });
-    // To Enable authorization using Swagger (JWT)
     swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
     {
         Name = "Authorization",
@@ -37,7 +35,7 @@ builder.Services.AddSwaggerGen(swagger =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Enter ‘Bearer’ [space] and then your valid token in the text input below.\r\n\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\"",
+        Description = "Enter a token",
     });
     swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
@@ -59,7 +57,6 @@ builder.Services.AddSwaggerGen(swagger =>
 builder.Services.AddDbContext<FlightContext>(options =>
 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// For Identity
 builder.Services.AddIdentity<UserModel, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -71,7 +68,6 @@ builder.Services.AddIdentity<UserModel, IdentityRole>(options =>
 .AddEntityFrameworkStores<FlightContext>()
 .AddDefaultTokenProviders();
 
-// Adding Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -79,7 +75,6 @@ builder.Services.AddAuthentication(options =>
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 
-// Adding Jwt Bearer
 .AddJwtBearer(options =>
 {
     options.SaveToken = true;
@@ -103,7 +98,6 @@ builder.Services.Configure<AuthenticationOptions>(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
