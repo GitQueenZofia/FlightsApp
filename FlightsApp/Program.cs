@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Moq;
 using System.Diagnostics.Metrics;
 using System.Net;
 using System.Reflection.Metadata;
@@ -32,7 +33,7 @@ builder.Services.AddSwaggerGen(swagger =>
     swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
     {
         Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
+        Type = SecuritySchemeType.Http,
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
@@ -53,6 +54,7 @@ builder.Services.AddSwaggerGen(swagger =>
 
         }
     });
+    
 });
 builder.Services.AddDbContext<FlightContext>(options =>
 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -65,7 +67,6 @@ builder.Services.AddIdentity<UserModel, IdentityRole>(options =>
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequireUppercase = true;
     options.Password.RequiredLength = 8;
-
 })
 .AddEntityFrameworkStores<FlightContext>()
 .AddDefaultTokenProviders();
@@ -106,7 +107,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Flights Web API v1");
+        c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
+    });
 }
 
 app.UseHttpsRedirection();
