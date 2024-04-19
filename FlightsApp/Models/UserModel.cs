@@ -2,7 +2,7 @@
 
 namespace FlightsApp.Models
 {
-    public class User: IdentityUser
+    public class UserModel: IdentityUser
     {
         
     }

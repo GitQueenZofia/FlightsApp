@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FlightsApp.Data
 {
-    public class FlightContext : IdentityDbContext<User>
+    public class FlightContext : IdentityDbContext<UserModel>
     {
-        public DbSet<Flight> Flights => Set<Flight>();
+        public DbSet<FlightModel> Flights => Set<FlightModel>();
 
         public FlightContext(DbContextOptions<FlightContext> options) : base(options)
         {
