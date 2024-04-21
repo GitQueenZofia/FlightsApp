@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FlightsApp.Models
+namespace FlightsApp.Dtos
 {
-    public class RegisterModel
+    public class RegisterDto
     {
-        [Required(ErrorMessage = "UserName is required")]
+        [Required(ErrorMessage = "Username is required")]
         public string UserName { get; set; }
         [Required(ErrorMessage = "Email is required")]
         public string Email { get; set; }

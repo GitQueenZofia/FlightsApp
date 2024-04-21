@@ -8,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using FlightsApp.Dtos;
 
 namespace FlightsApp.Repositories
 {
@@ -22,7 +23,7 @@ namespace FlightsApp.Repositories
             _configuration = configuration;
         }
 
-        public async Task<AuthResponse> Register(RegisterModel model)
+        public async Task<AuthResponse> Register(RegisterDto model)
         {
             var userExists = await _userManager.FindByNameAsync(model.UserName);
             if (userExists != null)
@@ -44,7 +45,7 @@ namespace FlightsApp.Repositories
             return new AuthResponse { Status = "Success" };
         }
 
-        public async Task<string> GenerateJwtToken(LoginModel model)
+        public async Task<string> GenerateJwtToken(LoginDto model)
         {
             var user = await _userManager.FindByNameAsync(model.UserName);
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))

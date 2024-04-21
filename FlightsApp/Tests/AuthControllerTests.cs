@@ -1,5 +1,6 @@
 ﻿using FlightsApp.Controllers;
 using FlightsApp.Data;
+using FlightsApp.Dtos;
 using FlightsApp.Models;
 using FlightsApp.Repositories;
 using Microsoft.AspNetCore.Identity;
@@ -98,7 +99,7 @@ namespace FlightsApp.Tests
         public async Task Register_ShouldRegisterUser()
         {
             // Arrange
-            var registerModel = new RegisterModel
+            var registerModel = new RegisterDto
             {
                 UserName = "testUser",
                 Email = "test@example.com",
@@ -122,7 +123,7 @@ namespace FlightsApp.Tests
         public async Task Register_ExistingUsername_ReturnsBadRequest()
         {
             // Arrange
-            var registerModel = new RegisterModel
+            var registerModel = new RegisterDto
             {
                 UserName = "testUser",
                 Email = "test@example.com",
@@ -146,7 +147,7 @@ namespace FlightsApp.Tests
         public async Task Register_WeakPassword_ReturnsBadRequest()
         {
             // Arrange
-            var registerModel = new RegisterModel
+            var registerModel = new RegisterDto
             {
                 UserName = "testUser",
                 Email = "test@example.com",
@@ -169,7 +170,7 @@ namespace FlightsApp.Tests
         public async Task Login_ValidCredentials_ReturnsToken()
         {
             // Arrange
-            var loginModel = new LoginModel
+            var loginModel = new LoginDto
             {
                 UserName = "testUser",
                 Password = "testPassword"
@@ -194,7 +195,7 @@ namespace FlightsApp.Tests
         public async Task Login_InvalidCredentials_ReturnsUnauthorized()
         {
             // Arrange
-            var loginModel = new LoginModel
+            var loginModel = new LoginDto
             {
                 UserName = "testUser",
                 Password = "testPassword"

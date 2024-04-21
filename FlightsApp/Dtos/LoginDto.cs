@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FlightsApp.Models
+namespace FlightsApp.Dtos
 {
-    public class LoginModel
+    public class LoginDto
     {
-        [Required(ErrorMessage = "UserName is required")]
+        [Required(ErrorMessage = "Username is required")]
         public string UserName { get; set; }
         [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; }
