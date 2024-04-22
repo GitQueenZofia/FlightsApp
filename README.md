@@ -15,7 +15,7 @@ UserManager has been mocked for testing AuthController.
 
 Additional info:
 - To access the API endpoints, users must first register and then log in.
-Use the /register endpoint to register a new user and /login to log in.
+Use the /Register endpoint to register a new user and /Login to log in.
 - Aircraft types are represented as an enum in the API. When specifying the aircraft type, use one of the following enum values:
 0, 1, 2, 3 (orresponding aicraft types: Embraer, Boeing, Airbus, Other respectively).
 - The database contains sample flights for demonstration purposes.
