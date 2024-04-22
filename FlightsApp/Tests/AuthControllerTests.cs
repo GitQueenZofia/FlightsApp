@@ -116,7 +116,7 @@ namespace FlightsApp.Tests
             var okResult = Assert.IsType<OkObjectResult>(result);
             var response = Assert.IsType<AuthResponse>(okResult.Value);
             Assert.Equal("Success", response.Status);
-            Assert.Equal("User created successfully", response.Message);
+            Assert.Equal("User created successfully.", response.Message);
         }
 
         [Fact]
