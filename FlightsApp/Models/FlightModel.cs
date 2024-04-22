@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 
 namespace FlightsApp.Models
 {
@@ -7,11 +8,16 @@ namespace FlightsApp.Models
     {
         public enum Aircraft
         {
+            [EnumMember(Value = "Embraer")]
             Embraer,
+            [EnumMember(Value = "Boeing")]
             Boeing,
+            [EnumMember(Value = "Airbus")]
             Airbus,
+            [EnumMember(Value = "Other")]
             Other
         }
+
         public int Id { get; set; }
 
         public string FlightNumber { get; set; }
@@ -22,6 +28,7 @@ namespace FlightsApp.Models
 
         public string DestinationLocation { get; set; }
 
+        [EnumDataType(typeof(Aircraft))]
         public Aircraft AircraftType { get; set; }
     }
 }

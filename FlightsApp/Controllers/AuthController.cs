@@ -19,16 +19,34 @@ namespace FlightsApp.Controllers
             _authRepository = authRepository;
         }
 
+        private bool IsValidEmail(string email)
+        {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         [HttpPost]
         [Route("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto model)
         {
+            if (!IsValidEmail(model.Email))
+            {
+                return BadRequest(new AuthResponse { Status = "Error", Message = "Invalid email format." });
+            }
+
             var result = await _authRepository.Register(model);
-            if (result.Status!="Success")
+            if (result.Status != "Success")
             {
                 return BadRequest(new AuthResponse { Status = "Error", Message = result.Message });
             }
-            return Ok(new AuthResponse { Status = "Success", Message = "User created successfully" });
+            return Ok(new AuthResponse { Status = "Success", Message = "User created successfully." });
         }
 
         [HttpPost]

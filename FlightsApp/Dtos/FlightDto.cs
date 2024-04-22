@@ -1,5 +1,6 @@
 ﻿using static FlightsApp.Models.FlightModel;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 
 namespace FlightsApp.Dtos
 {
@@ -18,6 +19,7 @@ namespace FlightsApp.Dtos
         public string DestinationLocation { get; set; }
 
         [Required(ErrorMessage = "Aircraft type is required.")]
+        [EnumDataType(typeof(Aircraft))]
         public Aircraft AircraftType { get; set; }
     }
 }
